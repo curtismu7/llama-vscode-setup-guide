@@ -19,3 +19,16 @@ Written in plain language so anyone can follow it. Covers:
 Built for Mac. The entire guide is a single self-contained `index.html` — no build
 step, no dependencies. Open it in a browser and use **File → Print → Save as PDF**
 to share it as a PDF.
+
+---
+
+## 📚 AI Demo — Learning Hub (web mirror)
+
+A public, static mirror of the AI Demo's in-app Learning Hub — **39 topic pages** on OAuth & identity,
+MCP & agents, standards, and AI architecture.
+
+### 👉 https://curtismu7.github.io/llama-vscode-setup-guide/learning/
+
+Each topic is a **single page with all its tabs stacked as labeled sections** (with an "On this page"
+jump list), so there's no clicking through tabs. A few interactive, live-data topics run only in the
+demo app and are marked accordingly.

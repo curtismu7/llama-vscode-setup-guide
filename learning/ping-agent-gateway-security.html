@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ping Agent Gateway Security — AI Demo Learning Hub</title>
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/snapshot.css">
+</head><body>
+<div class="snap-top"><a href="index.html">← Learning Hub</a><span class="crumb">/ Ping Agent Gateway Security</span></div>
+<div class="edu-drawer snap-drawer">
+<div class="snap-title">Ping Agent Gateway Security</div>
+<nav class="snap-toc"><span class="snap-toc-label">On this page — 5 sections</span><ul><li><a href="#sec-overview">Overview</a></li><li><a href="#sec-architecture">Architecture</a></li><li><a href="#sec-mcp-filters">MCP Filters</a></li><li><a href="#sec-custom-vs-pinggateway">Custom vs PingGateway</a></li><li><a href="#sec-configuration">Configuration</a></li></ul></nav>
+<div class="edu-drawer-body">
+<section class="snap-tab" id="sec-overview"><h3 class="snap-tab-h" id="sec-overview">Overview</h3><div><p style="color: rgb(55, 65, 81); margin-bottom: 1rem;"><strong>MCP servers contain no security logic.</strong> Token validation, scope enforcement, protocol compliance, rate limiting, and audit all live in the gateway. The MCP server trusts that whatever reaches it has already been authorized — it focuses entirely on tool execution.</p><h3 style="margin-top: 0px;">Why secure MCP with a gateway?</h3><p>MCP servers expose <strong>tools</strong> that perform real actions — account reads, transfers, user lookups. Without a gateway in front of the MCP server, every tool call hits the application directly with no centralized enforcement layer.</p><h4>What PingGateway adds</h4><ul><li><strong>Token validation</strong> — every request's Bearer token is introspected or JWT-verified before reaching the MCP server</li><li><strong>Scope enforcement</strong> — maps MCP tool names to required OAuth scopes (e.g. <code>get_balance</code> → <code>read</code>)</li><li><strong>Rate limiting</strong> — per-client, per-user, or per-tool call limits</li><li><strong>Audit logging</strong> — centralized log of every tool invocation with caller identity</li><li><strong>Content filtering</strong> — inspect request/response payloads for sensitive data leakage</li></ul><h4>Architecture</h4><pre class="edu-code">┌─────────────┐     ┌──────────────────┐     ┌────────────────┐
+│  BFF / Agent │────▶│   PingGateway    │────▶│   MCP Server   │
+│  (client)    │     │                  │     │                │
+│              │◀────│  • Token check   │◀────│  • tools/list  │
+│              │     │  • Scope enforce │     │  • tools/call  │
+│              │     │  • Rate limit    │     │  • resources   │
+│              │     │  • Audit log     │     │                │
+└─────────────┘     └──────────────────┘     └────────────────┘
+                           │
+                    ┌──────▼──────┐
+                    │   PingOne   │
+                    │ /as/introspect │
+                    │ /as/jwks    │
+                    └─────────────┘</pre><p>PingGateway acts as a <strong>reverse proxy</strong> — the MCP server never receives unauthenticated traffic. The gateway validates tokens by calling PingOne's introspection endpoint or verifying JWT signatures against the JWKS.</p></div></section>
+<section class="snap-tab" id="sec-architecture"><h3 class="snap-tab-h" id="sec-architecture">Architecture</h3><div><h3 style="margin-top: 0px;">Deployment topology</h3><h4>Option A: Sidecar (same host)</h4><pre class="edu-code">┌────────────────────────────────────┐
+│  Docker Host / K8s Pod             │
+│                                    │
+│  ┌──────────────┐  ┌────────────┐ │
+│  │ PingGateway  │──│ MCP Server │ │
+│  │ :8443 (TLS)  │  │ :8080      │ │
+│  └──────────────┘  └────────────┘ │
+│         │                          │
+└─────────┼──────────────────────────┘
+          │ Only :8443 exposed
+          ▼
+   External traffic</pre><h4>Option B: Standalone gateway</h4><pre class="edu-code">Internet          DMZ                  Private Network
+─────────    ┌──────────────┐    ┌────────────────────┐
+             │ PingGateway  │    │  MCP Server         │
+  Client ───▶│ Load balanced│───▶│  Not internet-facing│
+             │ TLS termination│  │  Internal DNS only  │
+             └──────────────┘    └────────────────────┘</pre><h4>Token validation flow</h4><ol><li>Client sends <code>tools/call</code> with <code>Authorization: Bearer &lt;token&gt;</code></li><li>PingGateway extracts the Bearer token</li><li>Gateway calls <code>POST /as/introspect</code> on PingOne (cached for token lifetime)</li><li>If <code>active: true</code> and scopes match → forward to MCP server</li><li>If invalid → return <code>401 Unauthorized</code> before MCP server is reached</li></ol><h4 style="color: rgb(30, 41, 59); margin-bottom: 0.5rem; margin-top: 1.5rem;">Route-level enforcement example</h4><table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;"><thead><tr style="background-color: rgb(30, 41, 59);"><th style="padding: 0.5rem; text-align: left; color: rgb(226, 232, 240);">Route</th><th style="padding: 0.5rem; text-align: left; color: rgb(226, 232, 240);">Required scope</th></tr></thead><tbody><tr style="border-bottom: 1px solid rgb(51, 65, 85);"><td style="padding: 0.5rem; color: rgb(55, 65, 81);"><code class="edu-code">/ecommerce</code></td><td style="padding: 0.5rem; color: rgb(55, 65, 81);"><code class="edu-code">read, write</code></td></tr><tr style="border-bottom: 1px solid rgb(51, 65, 85);"><td style="padding: 0.5rem; color: rgb(55, 65, 81);"><code class="edu-code">/crm</code></td><td style="padding: 0.5rem; color: rgb(55, 65, 81);"><code class="edu-code">crm:read, crm:write</code></td></tr></tbody></table><p style="color: rgb(55, 65, 81); margin-bottom: 1rem;">Each route is independently configured — a token scoped for <code class="edu-code">/ecommerce</code> is rejected at <code class="edu-code">/crm</code>.</p><h4>WebSocket upgrade</h4><p>MCP servers often use WebSocket (Streamable HTTP or legacy stdio-over-WS). PingGateway supports WebSocket upgrade — it validates the token on the initial HTTP upgrade request, then proxies the WebSocket frames transparently.</p></div></section>
+<section class="snap-tab" id="sec-mcp-filters"><h3 class="snap-tab-h" id="sec-mcp-filters">MCP Filters</h3><div><h3 style="margin-top: 0px;">Official PingGateway MCP filters</h3><p>PingGateway ships three dedicated MCP filters (as of 2025.11). They run as a chain before the <code>ReverseProxyHandler</code> that forwards traffic to the MCP server.</p><h4>Filter chain order</h4><pre class="edu-code">[McpAuditFilter] → [McpProtectionFilter] → [McpValidationFilter] → ReverseProxyHandler</pre><table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 1rem;"><thead><tr style="border-bottom: 2px solid rgb(229, 231, 235); text-align: left;"><th style="padding: 8px;">Filter</th><th style="padding: 8px;">What it does</th></tr></thead><tbody><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px;"><code>McpAuditFilter</code></td><td style="padding: 8px;">Records all MCP request activity to audit/mcp.audit.json<br>Audit log entries include user email (from <code class="edu-code">sub</code> claim resolution), agent <code class="edu-code">client_id</code> (from <code class="edu-code">act.sub</code>), the full delegation chain (<code class="edu-code">act</code> nesting), the target service, and request latency — giving complete attribution for every tool invocation.</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: rgb(249, 250, 251);"><td style="padding: 8px;"><code>McpProtectionFilter</code></td><td style="padding: 8px;">OAuth 2.0 resource server validation for MCP — introspects or JWT-verifies the Bearer token</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px;"><code>McpValidationFilter</code></td><td style="padding: 8px;">Validates MCP protocol compliance (message shape, method names, JSON-RPC structure)</td></tr></tbody></table><h4>McpProtectionFilter key properties</h4><pre class="edu-code">{
+  "type": "McpProtectionFilter",
+  "config": {
+    "resourceId": "https://ig.example.com:8443/mcp",
+    "authorizationServerUri": "https://auth.pingone.com/{envId}/as",
+    "resourceIdPointer": "/audience",
+    "supportedScopes": ["read", "write", "mcp:invoke"]
+  }
+}</pre><ul style="font-size: 0.82rem;"><li><strong>resourceId</strong> — the gateway endpoint URI, used as the expected <code>aud</code> value</li><li><strong>resourceIdPointer</strong> — JSON pointer into the JWT where the audience is found (typically <code>/audience</code>)</li><li><strong>supportedScopes</strong> — scopes this resource accepts; requests with other scopes are rejected</li></ul><h4>admin.json: enable streaming</h4><p>MCP relies on Server-Sent Events (SSE) for tool responses. Without this flag, SSE connections are closed immediately and tool calls silently drop.</p><pre class="edu-code">{
+  "streamingEnabled": true
+}</pre><h4>UriPathRewriteFilter + socket timeout</h4><p>The gateway routes <code>/mcp</code> to the backend's <code>/</code> root, and sets a long socket timeout to accommodate infrequent SSE heartbeats from AI agents.</p><pre class="edu-code">{
+  "type": "UriPathRewriteFilter",
+  "config": { "mappings": { "/mcp": "/" } }
+}
+
+// ReverseProxyHandler with extended timeout
+{
+  "type": "ReverseProxyHandler",
+  "config": {
+    "soTimeout": "20 seconds"
+  }
+}</pre><p style="font-size: 0.82rem; color: rgb(55, 65, 81); margin-top: 1rem;">Reference: <a href="https://docs.pingidentity.com/pinggateway/2025.11/mcp/index.html" target="_blank" rel="noopener noreferrer">MCP security gateway | PingGateway 2025.11</a></p></div></section>
+<section class="snap-tab" id="sec-custom-vs-pinggateway"><h3 class="snap-tab-h" id="sec-custom-vs-pinggateway">Custom vs PingGateway</h3><div><h3 style="margin-top: 0px;">Custom gateway vs PingGateway</h3><table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;"><thead><tr style="border-bottom: 2px solid rgb(229, 231, 235); text-align: left;"><th style="padding: 8px;">Capability</th><th style="padding: 8px;">Custom Gateway</th><th style="padding: 8px;">PingGateway</th></tr></thead><tbody><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px; font-weight: 600;">Token validation</td><td style="padding: 8px;">Build JWT verify + introspect logic</td><td style="padding: 8px;">Built-in, auto-discovers JWKS</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: rgb(249, 250, 251);"><td style="padding: 8px; font-weight: 600;">Scope enforcement</td><td style="padding: 8px;">Manual route → scope mapping</td><td style="padding: 8px;">Policy-driven, declarative config</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px; font-weight: 600;">Rate limiting</td><td style="padding: 8px;">Implement from scratch (Redis, etc.)</td><td style="padding: 8px;">Built-in per-client policies</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: rgb(249, 250, 251);"><td style="padding: 8px; font-weight: 600;">Audit logging</td><td style="padding: 8px;">Custom logging pipeline</td><td style="padding: 8px;">Integrated with PingOne audit</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px; font-weight: 600;">WebSocket support</td><td style="padding: 8px;">Build upgrade handling + frame proxy</td><td style="padding: 8px;">Native WebSocket proxy</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: rgb(249, 250, 251);"><td style="padding: 8px; font-weight: 600;">mTLS / TLS</td><td style="padding: 8px;">Configure certs manually</td><td style="padding: 8px;">Built-in cert management</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px; font-weight: 600;">Deployment</td><td style="padding: 8px;">Docker/K8s, you maintain</td><td style="padding: 8px;">Docker image, Ping maintains</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: rgb(249, 250, 251);"><td style="padding: 8px; font-weight: 600;">Time to production</td><td style="padding: 8px;">2–6 weeks engineering</td><td style="padding: 8px;">1–2 days configuration</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: white;"><td style="padding: 8px; font-weight: 600;">Ongoing maintenance</td><td style="padding: 8px;">You patch CVEs, update deps</td><td style="padding: 8px;">Ping patches, you upgrade image</td></tr><tr style="border-bottom: 1px solid rgb(243, 244, 246); background: rgb(249, 250, 251);"><td style="padding: 8px; font-weight: 600;">Cost</td><td style="padding: 8px;">Engineering time + infra</td><td style="padding: 8px;">License fee</td></tr></tbody></table><h4 style="margin-top: 1.5rem;">When to choose what</h4><ul><li><strong>Custom gateway</strong> — learning exercise, unique requirements not met by PingGateway, or you already have an API gateway (Kong, Envoy) with OAuth plugins</li><li><strong>PingGateway</strong> — production deployment, compliance requirements, need audit integration with PingOne, want minimal ongoing maintenance</li><li><strong>Hybrid</strong> — use your existing API gateway for HTTP routes, add PingGateway specifically for MCP/WebSocket traffic that needs identity-aware proxying</li></ul></div></section>
+<section class="snap-tab" id="sec-configuration"><h3 class="snap-tab-h" id="sec-configuration">Configuration</h3><div><h3 style="margin-top: 0px;">PingGateway configuration example</h3><p>PingGateway uses JSON-based route configurations. Below is an example route that protects an MCP server with token validation and scope enforcement.</p><h4>Route: MCP Server Protection</h4><pre class="edu-code">{
+  "name": "mcp-server-route",
+  "baseURI": "http://mcp-server:8080",
+  "condition": "${matches(request.uri.path, '^/mcp')}",
+  "handler": {
+    "type": "Chain",
+    "config": {
+      "filters": [
+        {
+          "type": "OAuth2ResourceServerFilter",
+          "config": {
+            "scopes": ["read"],
+            "accessTokenResolver": {
+              "type": "StatelessAccessTokenResolver",
+              "config": {
+                "issuer": "https://auth.pingone.com/{envId}/as",
+                "jwkSetUri": "https://auth.pingone.com/{envId}/as/jwks"
+              }
+            }
+          }
+        },
+        {
+          "type": "ScriptableFilter",
+          "config": {
+            "type": "application/x-groovy",
+            "source": [
+              "// Map MCP tool names to required scopes",
+              "def toolName = request.entity.json?.params?.name",
+              "def scopeMap = [",
+              "  'get_balance':    'read',",
+              "  'get_transactions': 'read',",
+              "  'transfer_funds': 'transfer',",
+              "  'get_all_users':  'admin'",
+              "]",
+              "def required = scopeMap[toolName]",
+              "if (required &amp;&amp; !context.oauth2.scopes.contains(required)) {",
+              "  return new Response(Status.FORBIDDEN)",
+              "}",
+              "return next.handle(context, request)"
+            ]
+          }
+        },
+        {
+          "type": "ThrottlingFilter",
+          "config": {
+            "rate": { "numberOfRequests": 100, "duration": "1 minute" }
+          }
+        }
+      ],
+      "handler": "ClientHandler"
+    }
+  }
+}</pre><h4>Key configuration sections</h4><ul><li><strong>OAuth2ResourceServerFilter</strong> — validates Bearer token against PingOne JWKS</li><li><strong>ScriptableFilter</strong> — maps tool names to required scopes (Groovy script)</li><li><strong>ThrottlingFilter</strong> — rate limits to 100 requests/minute</li><li><strong>baseURI</strong> — points to the internal MCP server (not exposed publicly)</li></ul><h4>Audit logging</h4><pre class="edu-code">{
+  "type": "AuditService",
+  "config": {
+    "config": {
+      "handlerForQueries": {
+        "type": "PingOneAuditHandler",
+        "config": {
+          "environmentId": "${env.PINGONE_ENVIRONMENT_ID}",
+          "apiKey": "${env.PINGONE_AUDIT_API_KEY}"
+        }
+      }
+    }
+  }
+}</pre><p>With audit configured, every MCP tool call is logged to PingOne's audit system with the caller's identity (sub claim), scopes used, and response status.</p></div></section>
+</div></div>
+<div class="snap-foot">Snapshot of the AI Demo Learning Hub · all sections of this topic on one page · <a href="index.html">back to index</a></div>
+</body></html>
