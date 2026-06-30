@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Architecture Diagrams — AI Demo Learning Hub</title>
+<style>
+:root{--ink:#1c2230;--mut:#5a6271;--ac:#6b46ff;--line:#e3e6ec;--bg:#f4f6f8;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:0 18px 80px}
+.top{display:flex;align-items:center;gap:10px;font-size:14px;padding:16px 2px 4px}
+.top a{color:var(--ac);text-decoration:none;font-weight:600}
+.top a:hover{text-decoration:underline}
+.top .crumb{color:#8a93a3}
+h1{font-size:1.7rem;margin:.3em 0 .1em}
+.lead{color:var(--mut);margin:0 0 18px;max-width:760px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.toc a{padding:5px 13px;background:#fff;border:1px solid var(--line);border-radius:999px;
+  color:#4a4f5e;text-decoration:none;font-size:.86rem;font-weight:600}
+.toc a:hover{border-color:var(--ac);color:var(--ac)}
+section.diag{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;margin:0 0 22px;box-shadow:0 6px 24px rgba(20,30,60,.05);scroll-margin-top:14px}
+section.diag h2{margin:0 0 4px;font-size:1.2rem}
+.badge{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:2px 9px;border-radius:999px;margin-left:8px;vertical-align:middle}
+.badge.live{background:#e7f8ef;color:#15a36a;border:1px solid #b9ead0}
+.badge.snap{background:#f0eefb;color:#6b46ff;border:1px solid #ddd5fb}
+.cap{color:var(--mut);font-size:.9rem;margin:4px 0 14px}
+.frame{width:100%;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+iframe.tf{width:100%;height:680px;border:0;display:block}
+img.diagram{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:#fff}
+.foot{color:#8a93a3;font-size:.82rem;text-align:center;margin-top:36px}
+.foot a{color:var(--ac);text-decoration:none}
+</style></head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="index.html">← Learning Hub</a><span class="crumb">/ Architecture Diagrams</span></div>
+  <h1>🏗️ Architecture Diagrams</h1>
+  <p class="lead">How the AI Demo fits together — the token-exchange flow, the system architecture graph, and the
+  agent-gateway service map. The token flow below is fully interactive; the other two are snapshots of the
+  live, interactive diagrams in the demo app.</p>
+
+  <nav class="toc">
+    <a href="#token-flow">Token Flow (interactive)</a>
+    <a href="#system">System Architecture</a>
+    <a href="#gateway">Agent Gateway Map</a>
+  </nav>
+
+  <section class="diag" id="token-flow">
+    <h2>Token Flow <span class="badge live">Interactive</span></h2>
+    <p class="cap">RFC 8693 token exchange across Browser → BFF → Agent Gateway → MCP. Fully interactive — hover and step through it below.</p>
+    <div class="frame"><iframe class="tf" title="Token Flow (interactive)" src="architecture/token-flow.html" loading="lazy"></iframe></div>
+  </section>
+
+  <section class="diag" id="system">
+    <h2>System Architecture <span class="badge snap">Snapshot · React&nbsp;Flow</span></h2>
+    <p class="cap">The full system graph — identity provider, authorization server, agent, agent gateway, MCP servers, and banking services, with the protocol on each connection. This is a static snapshot of the pannable React&nbsp;Flow diagram in the live app.</p>
+    <img class="diagram" src="assets/arch-flow.png" alt="System architecture diagram: User, Chatbot, Agent (BFF LangGraph), Agent Gateway, PingOne Authorization Server, IdP, Banking API, MCP Server, HITL Service, and banking services with labeled OAuth/RFC connections.">
+  </section>
+
+  <section class="diag" id="gateway">
+    <h2>Agent Gateway — Service Map <span class="badge snap">Snapshot · Konva</span></h2>
+    <p class="cap">Swim-lane view of the agent gateway architecture: Browser → BFF → Agent Layer → Agent Gateway → Auth/Policy → MCP backends. Static snapshot of the editable Konva canvas in the live app.</p>
+    <img class="diagram" src="assets/arch-canvas.png" alt="Agent gateway service map: frontend, bff, langchain-agent, agent-service, Ping Agent Gateway, PingOne Authorize, PingOne SSO, HITL Service, mcp-server, mcp-invest, mortgage-service across labeled lanes.">
+  </section>
+
+  <div class="foot">Part of the <a href="index.html">AI Demo Learning Hub</a> · the two snapshots are interactive in the live demo app.</div>
+</div>
+</body></html>
