@@ -23,5 +23,5 @@ body{margin:0;background:#f4f6f8;color:#1c2230;
   color:#6b46ff;border-top:1px solid #eef0f4;font-weight:700;display:flex;align-items:center;gap:8px}
 .snap-tab:first-of-type .snap-tab-h{border-top:none;padding-top:6px}
 .snap-tab-h::before{content:"";width:8px;height:8px;border-radius:50%;background:#6b46ff;flex:0 0 auto}
-.snap-foot{width:100%;max-width:920px;margin:20px auto 0;color:#8a93a3;font-size:12px;text-align:center}
+.snap-foot{width:100%;max-width:920px;margin:26px auto 0;color:#1c2230;font-size:16px;font-weight:600;text-align:center}
 .snap-foot a{color:#6b46ff;text-decoration:none}

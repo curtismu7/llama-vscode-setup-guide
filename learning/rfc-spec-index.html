@@ -14,5 +14,18 @@
 <section class="snap-tab" id="sec-this-panel"><h3 class="snap-tab-h" id="sec-this-panel">This panel</h3><h3 style="margin-top: 0px;">What this panel does in code</h3><p style="font-size: 0.82rem; color: rgb(71, 85, 105); margin-top: 0px; margin-bottom: 0.65rem; line-height: 1.55;"><strong style="color: rgb(22, 101, 52);">This repo</strong>: <code style="font-size: 0.85em; word-break: break-all;">banking_api_ui/src/components/education/RFCIndexPanel.js</code> Rows dispatch <code>open(panel, tab)</code> or the CIBA window event — they do not implement OAuth by themselves.</p><pre class="edu-code">// This drawer is an index only — it opens other Learn panels via EducationUIContext.
 // No separate “RFC engine” in code; each linked area (login, MCP, exchange, …) owns its logic.</pre></section>
 </div></div>
-<div class="snap-foot">Snapshot of the AI Demo Learning Hub · all sections of this topic on one page · <a href="index.html">back to index</a></div>
+<div class="snap-foot">The AI Demo Learning Hub · <a href="index.html">back to index</a></div>
+<style>
+#backToTop{position:fixed;right:22px;bottom:22px;z-index:50;background:#1c2230;color:#fff;border:0;border-radius:999px;padding:10px 18px;font:600 .9rem -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(28,34,48,.35);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s,transform .2s,visibility .2s}
+#backToTop.show{opacity:1;visibility:visible;transform:translateY(0)}
+#backToTop:hover{background:#39435c}
+</style>
+<button id="backToTop" type="button" aria-label="Back to top">↑ Top</button>
+<script>
+(function(){
+  var btn=document.getElementById('backToTop');
+  window.addEventListener('scroll',function(){btn.classList.toggle('show',window.scrollY>400);},{passive:true});
+  btn.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
+</script>
 </body></html>
