@@ -143,7 +143,7 @@ At/above threshold (step-up):
   UI shows MFA prompt; polls /api/ciba/status
   On approval → retry POST /api/mcp/tool (same body)
   → 200 { result: "Transfer complete" }</pre></section>
-<section class="snap-tab" id="sec-handshake-sequence"><h3 class="snap-tab-h" id="sec-handshake-sequence">Handshake sequence</h3><h3 style="">MCP JSON-RPC Handshake</h3><p>Every MCP session opens with a fixed four-step handshake over WebSocket. Messages are JSON-RPC 2.0. <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/" target="_blank" rel="noopener noreferrer" class="edu-rfc-link" title="Model Context Protocol Specification">MCP 2025-11-25<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2H2v8h8V7M7 1h4v4M11 1 5.5 6.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></p><h4>Step 1 — Client → Server: <code>initialize</code></h4><pre class="edu-code">{
+<section class="snap-tab" id="sec-handshake-sequence"><h3 class="snap-tab-h" id="sec-handshake-sequence">Handshake sequence</h3><h3 style="">MCP JSON-RPC Handshake</h3><p>Every MCP session opens with a fixed four-step handshake over stdio (local) or Streamable HTTP (remote). Messages are JSON-RPC 2.0. <a href="https://spec.modelcontextprotocol.io/specification/2025-11-25/" target="_blank" rel="noopener noreferrer" class="edu-rfc-link" title="Model Context Protocol Specification">MCP 2025-11-25<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 2H2v8h8V7M7 1h4v4M11 1 5.5 6.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></p><h4>Step 1 — Client → Server: <code>initialize</code></h4><pre class="edu-code">{
   "jsonrpc": "2.0",
   "id": 1,
   "method": "initialize",
