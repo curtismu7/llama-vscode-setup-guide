@@ -10,7 +10,7 @@
 <div class="snap-title">Glean + PingOne</div>
 <nav class="snap-toc"><span class="snap-toc-label">On this page — 3 sections</span><ul><li><a href="#sec-overview">Overview</a></li><li><a href="#sec-ciba-flow">CIBA flow</a></li><li><a href="#sec-mcp-gateway">MCP Gateway</a></li></ul></nav>
 <div class="edu-drawer-body">
-<section class="snap-tab" id="sec-overview"><h3 class="snap-tab-h" id="sec-overview">Overview</h3><div><h3 style="margin-top: 0px;">Glean + PingOne: Enterprise AI Authorization</h3><p>Glean is an enterprise AI assistant and search platform. When deployed at organizations like eBay, it connects to dozens of internal data sources and exposes a chat interface backed by retrieval-augmented generation (RAG). The identity and authorization layer ensures Glean only surfaces data the requesting user is entitled to see.</p><img alt="Glean integration architecture with PingFed, PingAuthorize, CIBA, and MCP Gateway" src="/images/glean-architecture.png" style="width: 100%; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border-light, #ddd); display: none;"><pre class="edu-code">
+<section class="snap-tab" id="sec-overview"><h3 class="snap-tab-h">Overview</h3><div><h3 style="margin-top: 0px;">Glean + PingOne: Enterprise AI Authorization</h3><p>Glean is an enterprise AI assistant and search platform. When deployed at organizations like eBay, it connects to dozens of internal data sources and exposes a chat interface backed by retrieval-augmented generation (RAG). The identity and authorization layer ensures Glean only surfaces data the requesting user is entitled to see.</p><img alt="Glean integration architecture with PingFed, PingAuthorize, CIBA, and MCP Gateway" src="/images/glean-architecture.png" style="width: 100%; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border-light, #ddd); display: none;"><pre class="edu-code">
   ┌─────────────────────────────────────────────────┐
   │               eBay Enterprise                    │
   │                                                  │
@@ -28,7 +28,7 @@
   │  └──────────┘               └──────────────┘   │
   │                                                 │
   └─────────────────────────────────────────────────┘</pre><h4>Key components</h4><ul><li><strong>Glean Platform</strong> — Enterprise AI search and assistant; acts as the AI agent orchestrating tool calls across internal services.</li><li><strong>PingFed</strong> — Enterprise identity provider handling SSO, OIDC token issuance, and CIBA for delegated authorization flows.</li><li><strong>PingAuthorize</strong> — Evaluates fine-grained access policies before any MCP tool call proceeds; PERMIT/DENY per-request based on user identity, resource attributes, and contextual signals.</li><li><strong>MCP Gateway</strong> — Sits between Glean and backend MCP servers; validates inbound tokens, calls PingAuthorize for fine-grained policy evaluation, and forwards the original bearer token to MCP servers only on PERMIT.</li></ul></div></section>
-<section class="snap-tab" id="sec-ciba-flow"><h3 class="snap-tab-h" id="sec-ciba-flow">CIBA flow</h3><div><h3 style="margin-top: 0px;">CIBA for Agent Authorization</h3><p>Client-Initiated Backchannel Authentication (CIBA) lets Glean request user approval out-of-band — without interrupting the browser session. This is critical for enterprise AI agents that may need elevated permissions for a specific action.</p><pre class="edu-code">
+<section class="snap-tab" id="sec-ciba-flow"><h3 class="snap-tab-h">CIBA flow</h3><div><h3 style="margin-top: 0px;">CIBA for Agent Authorization</h3><p>Client-Initiated Backchannel Authentication (CIBA) lets Glean request user approval out-of-band — without interrupting the browser session. This is critical for enterprise AI agents that may need elevated permissions for a specific action.</p><pre class="edu-code">
   1. Glean agent needs elevated access
         │
         ▼
@@ -50,7 +50,7 @@
         │
         ▼
   6. Glean proceeds with authorized tool call</pre><p>This pattern keeps the AI agent honest — it cannot act with elevated scope without explicit human approval, even if the LLM requests it. Human-in-the-loop approval is enforced at the IdP layer, not just the application layer.</p></div></section>
-<section class="snap-tab" id="sec-mcp-gateway"><h3 class="snap-tab-h" id="sec-mcp-gateway">MCP Gateway</h3><div><h3 style="margin-top: 0px;">MCP Gateway Security Pipeline</h3><p>The MCP Gateway is the enforcement boundary between Glean's AI layer and backend tool servers. Every tool call passes through the full pipeline:</p><pre class="edu-code">
+<section class="snap-tab" id="sec-mcp-gateway"><h3 class="snap-tab-h">MCP Gateway</h3><div><h3 style="margin-top: 0px;">MCP Gateway Security Pipeline</h3><p>The MCP Gateway is the enforcement boundary between Glean's AI layer and backend tool servers. Every tool call passes through the full pipeline:</p><pre class="edu-code">
   Glean → [1] Validate inbound token (aud = gateway)
        → [2] GatewayTokenPolicy (sub, act.sub, anti-bypass)
        → [3] PingAuthorize PERMIT/DENY/INDETERMINATE
