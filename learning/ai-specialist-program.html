@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Specialist Program One-Slide Mock</title>
+  <style>
+    :root {
+      --artifact-background: #ffffff;
+      --artifact-background-light: #f1f3f6;
+      --artifact-background-mid: #e9ecf1;
+      --artifact-border-light: #e3e6ec;
+      --artifact-border-dark: #cdd2db;
+      --artifact-primary-brand: #3559e6;
+      --artifact-primary-highlight: #0d0f14;
+      --artifact-primary-hover: #2442b8;
+      --artifact-selected: #eaeefc;
+      --artifact-text-primary: #11141a;
+      --artifact-text-secondary: #5c6470;
+      --artifact-text-highlight: #e8eefc;
+      --artifact-positive-background: #e8f6ee;
+      --artifact-positive-text: #11141a;
+      --artifact-positive: #159a6a;
+      --artifact-negative: #dc4c4c;
+    }
+    html[data-theme='dark'] {
+      --artifact-background: #0a0b0e;
+      --artifact-background-light: #121419;
+      --artifact-background-mid: #181b22;
+      --artifact-border-light: #23262e;
+      --artifact-border-dark: #343844;
+      --artifact-primary-brand: #6a92ff;
+      --artifact-primary-highlight: #f5f7fb;
+      --artifact-primary-hover: #88a8ff;
+      --artifact-selected: #1a2030;
+      --artifact-text-primary: #eef0f4;
+      --artifact-text-secondary: #9aa0ad;
+      --artifact-text-highlight: #14213d;
+      --artifact-positive-background: #0e2a1d;
+      --artifact-positive-text: #c8f5da;
+      --artifact-positive: #46d39a;
+      --artifact-negative: #ff6b6b;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: var(--artifact-background);
+      color: var(--artifact-text-primary);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.6;
+      letter-spacing: -0.005em;
+    }
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+    .deck-frame {
+      width: min(1600px, 100%);
+    }
+    .slide {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      background: var(--artifact-background);
+      border: 1px solid var(--artifact-border-light);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      min-height: 720px;
+    }
+    .panel {
+      padding: 56px 60px;
+      position: relative;
+    }
+    .panel-right {
+      background: var(--artifact-background-light);
+      border-left: 1px solid var(--artifact-border-light);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 24px;
+    }
+    .eyebrow, .micro {
+      font-family: "SF Mono", "IBM Plex Mono", "Cascadia Code", "Consolas", monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--artifact-text-secondary);
+    }
+    .eyebrow-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .accent-rule {
+      width: 84px;
+      height: 1px;
+      background: var(--artifact-border-dark);
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(3rem, 5vw, 5.2rem);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+      font-weight: 320;
+      max-width: 10ch;
+    }
+    .summary {
+      margin-top: 28px;
+      max-width: 62ch;
+      font-size: 1.08rem;
+      color: var(--artifact-text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .hero-band {
+      margin-top: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      background: var(--artifact-text-highlight);
+      color: var(--artifact-text-primary);
+      border: 1px solid var(--artifact-border-light);
+      max-width: 700px;
+    }
+    .hero-band strong {
+      font-weight: 600;
+      color: var(--artifact-primary-highlight);
+    }
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 46px;
+    }
+    .pill {
+      background: var(--artifact-background-light);
+      border: 1px solid var(--artifact-border-light);
+      padding: 18px 18px 20px;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .pill .num {
+      font-size: 0.9rem;
+      color: var(--artifact-primary-brand);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pill h3 {
+      margin: 10px 0 10px;
+      font-size: 1.15rem;
+      line-height: 1.15;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .pill p {
+      margin: 0;
+      color: var(--artifact-text-secondary);
+      font-size: 0.96rem;
+      line-height: 1.45;
+    }
+    .network-card,
+    .flow-card,
+    .leader-card {
+      background: var(--artifact-background);
+      border: 1px solid var(--artifact-border-light);
+    }
+    .network-card {
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+    .network-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+    .network-note {
+      color: var(--artifact-text-secondary);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .flow-card {
+      padding: 20px 22px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    .flow-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding-top: 12px;
+      border-top: 1px solid var(--artifact-border-light);
+    }
+    .flow-step:first-of-type { border-top: 0; padding-top: 0; }
+    .flow-badge {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      background: var(--artifact-selected);
+      color: var(--artifact-primary-brand);
+      border: 1px solid var(--artifact-border-light);
+      font-family: "SF Mono", "IBM Plex Mono", "Consolas", monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .flow-step h4 {
+      margin: 0 0 4px;
+      font-size: 0.96rem;
+      line-height: 1.2;
+      font-weight: 600;
+      color: var(--artifact-text-primary);
+    }
+    .flow-step p {
+      margin: 0;
+      color: var(--artifact-text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .leader-card {
+      padding: 18px 22px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .leader-line {
+      font-size: 1.05rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .leader-line strong {
+      font-weight: 600;
+      color: var(--artifact-primary-highlight);
+    }
+    .footer {
+      position: absolute;
+      left: 60px;
+      right: 60px;
+      bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      color: var(--artifact-text-secondary);
+      font-size: 0.82rem;
+      line-height: 1.35;
+      padding-top: 14px;
+      border-top: 1px solid var(--artifact-border-light);
+    }
+    .footer strong {
+      color: var(--artifact-text-primary);
+      font-weight: 600;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid var(--artifact-border-dark);
+      color: var(--artifact-text-secondary);
+      background: var(--artifact-background);
+      font-size: 11px;
+      line-height: 1;
+      cursor: default;
+      flex: 0 0 auto;
+      margin-top: 3px;
+    }
+    .tooltip .tip {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 10px);
+      transform: translateX(-50%);
+      width: 340px;
+      padding: 10px 12px;
+      background: var(--artifact-background);
+      color: var(--artifact-text-secondary);
+      border: 1px solid var(--artifact-border-dark);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 10;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      text-transform: none;
+      letter-spacing: normal;
+      box-shadow: 0 0 0 1px var(--artifact-background);
+    }
+    .tooltip:hover .tip,
+    .tooltip:focus-within .tip { opacity: 1; }
+    .brand-mark {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      color: var(--artifact-text-secondary);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .snapshot-card {
+      padding: 14px 14px 16px;
+      background: var(--artifact-background-light);
+      border: 1px solid var(--artifact-border-light);
+      min-height: 118px;
+    }
+    .snapshot-card h4 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      line-height: 1.2;
+      font-weight: 600;
+      color: var(--artifact-text-primary);
+    }
+    .snapshot-card p {
+      margin: 0;
+      color: var(--artifact-text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.42;
+    }
+    .keyline {
+      height: 1px;
+      background: var(--artifact-border-light);
+      width: 100%;
+    }
+    @media (max-width: 1180px) {
+      body { padding: 14px; }
+      .slide { grid-template-columns: 1fr; aspect-ratio: auto; }
+      .panel, .panel-right { padding: 28px; }
+      .pill-grid { grid-template-columns: 1fr; }
+      .footer { position: static; margin-top: 22px; }
+      h1 { max-width: none; }
+    }
+    @media print {
+      body {
+        margin: 0;
+        padding: 0.25in;
+        background: #fff;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      .deck-frame { width: 100% !important; }
+      .slide {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        break-inside: avoid;
+      }
+      .panel, .panel-right {
+        padding: 28px !important;
+      }
+      .pill, .network-card, .flow-card, .leader-card {
+        break-inside: avoid;
+      }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck-frame">
+    <section class="slide">
+      <div class="brand-mark">Ping Identity</div>
+      <div class="panel">
+        <div class="eyebrow-row">
+          <div class="eyebrow">AI Specialist Program</div>
+          <div class="accent-rule"></div>
+        </div>
+        <h1>A cleaner way to scale AI specialist support.</h1>
+        <div class="summary">
+          <span class="tooltip" tabindex="0">ℹ
+            <span class="tip">This message is synthesized from the July 2026 AI Specialist rollout materials: Adnan's CRO-wide launch note, Paul's tactical follow-up, the Global AI Specialist Network deck, and the intake-process guidance for field teams.</span>
+          </span>
+          <span>Bring deeper Identity for AI expertise into the right deals without creating a new overlay motion or disrupting account ownership.</span>
+        </div>
+
+        <div class="hero-band">
+          <strong>What is launching:</strong>
+          <span>A pilot Global AI Specialist Network for qualified strategic opportunities, workshops, architecture reviews, and POCs.</span>
+        </div>
+
+        <div class="pill-grid">
+          <article class="pill">
+            <div class="num">01</div>
+            <div>
+              <h3>Use it for qualified strategic AI work</h3>
+              <p>Not every AI conversation needs a specialist. Engage the team when the opportunity needs deeper architecture, validation, or product-shaping support.</p>
+            </div>
+          </article>
+          <article class="pill">
+            <div class="num">02</div>
+            <div>
+              <h3>Keep the AE and POD SE at the center</h3>
+              <p>The specialist augments the account team rather than replacing ownership, relationship continuity, or end-to-end execution.</p>
+            </div>
+          </article>
+          <article class="pill">
+            <div class="num">03</div>
+            <div>
+              <h3>Route requests through formal intake</h3>
+              <p>After initial AE and SE discovery, use the official workflow so requests can be reviewed consistently and capacity prioritized responsibly.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="footer">
+          <div><strong>Core message:</strong> deepen coverage on high-impact AI opportunities while creating reusable field assets, enablement, and product feedback.</div>
+          <div><strong>Audience:</strong> sales leaders, AEs, and SEs</div>
+        </div>
+      </div>
+
+      <aside class="panel panel-right">
+        <div class="network-card">
+          <div class="eyebrow">What changes — and what does not</div>
+          <div class="snapshot-grid">
+            <div class="snapshot-card">
+              <h4>What changes</h4>
+              <p>There is now a clear path to bring in deeper AI architecture support for qualified opportunities, workshops, and POCs.</p>
+            </div>
+            <div class="snapshot-card">
+              <h4>What stays the same</h4>
+              <p>The AE and POD SE still own the deal. The specialist is added to strengthen the team, not to replace it.</p>
+            </div>
+            <div class="snapshot-card">
+              <h4>How work gets routed</h4>
+              <p>Requests move through a formal intake and review path so capacity can be prioritized instead of handled ad hoc.</p>
+            </div>
+            <div class="snapshot-card">
+              <h4>How the model scales</h4>
+              <p>Specialists remain in their regions while the program captures reusable patterns, field feedback, and enablement learnings.</p>
+            </div>
+          </div>
+          <p class="network-note">This keeps the operating model simple: focused specialist depth where it matters, with no new overlay organization to explain.</p>
+        </div>
+
+        <div class="flow-card">
+          <div class="eyebrow">Engagement motion</div>
+          <div class="flow-step">
+            <div class="flow-badge">1</div>
+            <div>
+              <h4>Initial discovery</h4>
+              <p>AE and SE complete the first discovery conversation and define the customer's AI initiative.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-badge">2</div>
+            <div>
+              <h4>Formal intake</h4>
+              <p>Submit the qualified request through the official workflow instead of reaching out to specialists directly.</p>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="flow-badge">3</div>
+            <div>
+              <h4>Leadership routing</h4>
+              <p>Regional leadership plus program leads review, prioritize, and align the right level of support.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="leader-card">
+          <div class="eyebrow">Program leadership</div>
+          <p class="leader-line"><strong>Tarun Madiraju</strong> and <strong>Curtis Muir</strong> coordinate the pilot globally in partnership with Sales, SE, Product Management, and other stakeholders.</p>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    window.GleanBridge.postMessage({
+      actionId: 'export-pdf',
+      type: 'glean-add-menu',
+      metadata: { label: 'Export as PDF', icon: 'export' }
+    });
+    window.GleanBridge.onMessage('action', function(data) {
+      if (data.actionId === 'export-pdf') window.print();
+    });
+
+    function prepareChartsForPrint() {}
+    function cleanUpAfterPrint() {}
+    window.addEventListener('beforeprint', prepareChartsForPrint);
+    window.addEventListener('afterprint', cleanUpAfterPrint);
+  </script>
+</body>
+</html>
