@@ -12,7 +12,7 @@
 <div class="edu-drawer-body">
 <section class="snap-tab" id="sec-overview"><h3 class="snap-tab-h">Overview</h3><div><h3 style="margin-top: 0px;">What is LangChain?</h3><p>LangChain is an open-source framework for building LLM applications. <strong>LCEL (LangChain Expression Language)</strong> — a declarative pipe-syntax for composing prompts, models, tools and output parsers into streaming-first chains — was introduced in 2023, before the 0.1 release. This demo pins <strong>0.3.x</strong>; the current stable release is <strong>LangChain 1.x</strong> (GA Oct 2025), which recommends <code>create_agent</code> / LangGraph as the default agent pattern.</p><h3>LCEL in one line</h3><pre class="edu-code">chain = prompt | llm.bind_tools(tools)</pre><p><code>bind_tools</code> attaches your MCP tools to the LLM. The model decides which tools to call; you run the tool-calling loop yourself or let LangGraph manage it.</p><h3>Model-agnostic by design</h3><p>Each provider ships its own <code>langchain-*</code> package. You swap the LLM object — the rest of the chain stays the same.</p><pre class="edu-code">| Provider   | Package                  | Default model              |
 |------------|--------------------------|----------------------------|
-| Groq       | langchain-groq           | llama-3.1-8b-instant       |
+| Groq       | langchain-groq           | openai/gpt-oss-20b         |
 | OpenAI     | langchain-openai         | gpt-4o-mini                |
 | Anthropic  | langchain-anthropic      | claude-haiku-4-5-20251001  |
 | Google AI  | langchain-google-genai   | gemini-2.0-flash           |
@@ -21,7 +21,7 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
-llm = ChatGroq(model="llama-3.1-8b-instant", api_key=groq_key)
+llm = ChatGroq(model="openai/gpt-oss-20b", api_key=groq_key)
 
 # Bind tools so the model can call them
 chain = prompt | llm.bind_tools(tools)
